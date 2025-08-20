@@ -1,0 +1,46 @@
+TODO:
+    We got the database side working. Now need to get webserver side working. Display database data in index.php.
+
+    Get interface to upload to database.
+    Get user profiles working.
+
+Rules:
+    Needs to operate on at least 3 different machines.
+    One of which should be responsible for data storage.
+    
+Lets use vagrant.
+
+Ideas:
+
+Chinese Learning tool:
+    Provides a simple and fun method for chinese practice.
+    
+    Bare bones basic program which can be iterated
+    on later for my chinese portfolio.
+
+    Base program:
+
+        Can create user profile.
+
+        User can add characters they want to learn. Or add from a selection of lessons in the NPCR textbook.
+        Then add pinyin. <<<<  https://pinyin.js.org/en-US
+        Then add definition.
+        Add rememberence prompt (a memnonic which helps them remember.) Pops up
+        if they choose.
+
+        Upon play:
+            Goes through each word randomly in the set.
+            For each word it either shows either:
+                pinyin. The player has to choose out of a set of random characters.
+                hanzi. The player has to either type pinyin or english meaning.
+                english word. The player has to input the chinese character.
+            Records time.
+
+    Future:
+        https://talkify.net/#tryme for TTS. 1000 free requests per month. Need to get an API key.
+
+
+    1st VM. Serves web content. Website.
+    2nd VM. Database. Account data.
+    3rd VM function - Figure out later. Pinyin options？ 
+    
