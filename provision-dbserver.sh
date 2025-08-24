@@ -16,7 +16,7 @@ service mysql start
 
 echo "CREATE DATABASE test;" | mysql
 
-echo "CREATE USER 'webuser'@'%' IDENTIFIED BY 'db_tobechanged'" | mysql
+echo "CREATE USER 'webuser'@'%' IDENTIFIED BY 'db_tobechanged';" | mysql
 
 echo "GRANT ALL PRIVILEGES ON test.* TO 'webuser'@'%';" | mysql
 
