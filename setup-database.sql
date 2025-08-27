@@ -1,8 +1,5 @@
-CREATE TABLE test_table (
-    row_num int,
-    sentence varchar(255),
-    PRIMARY KEY (row_num)
+CREATE TABLE users (
+    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(50) NOT NULL
 );
-
-INSERT INTO test_table (row_num, sentence) VALUES (1, "hello world");
-INSERT INTO test_table (row_num, sentence) VALUES (2, "I am Jack");

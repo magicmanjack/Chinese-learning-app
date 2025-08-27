@@ -1,8 +1,13 @@
 TODO:
-    We got the database side working. Now need to get webserver side working. Display database data in index.php.
+    https://www.tutorialrepublic.com/php-tutorial/php-mysql-login-system.php
+    Continue following ^^ tutorial and implement user registration.
 
+    Add backend after submit button pressed. Mostly there. Check TODO in register.php
+    
     Get interface to upload to database.
-    Get user profiles working.
+
+Future:
+    Implement secure storing of user passwords using hashing algorithm and salt.
 
 Rules:
     Needs to operate on at least 3 different machines.

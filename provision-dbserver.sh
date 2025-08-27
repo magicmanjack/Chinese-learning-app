@@ -4,7 +4,6 @@ apt-get update
 
 #TODO: root user name and password. Insecure?
 export MYSQL_PWD='insecure_mysqlroot_pw'
-#export MYSQL_USER='webuser'
 
 #prepopulate debconf database with answers to questions.
 echo "mysql-server mysql-server/root_password password $MYSQL_PWD" | debconf-set-selections
@@ -16,11 +15,11 @@ service mysql start
 
 echo "CREATE DATABASE test;" | mysql
 
-echo "CREATE USER 'webuser'@'%' IDENTIFIED BY 'db_tobechanged';" | mysql
+echo "CREATE USER 'webuser'@'%' IDENTIFIED BY 'aaftwup123!';" | mysql
 
 echo "GRANT ALL PRIVILEGES ON test.* TO 'webuser'@'%';" | mysql
 
-export MYSQL_PWD='db_tobechanged'
+export MYSQL_PWD='aaftwup123!'
 
 cat /vagrant/setup-database.sql | mysql -u webuser test
 
