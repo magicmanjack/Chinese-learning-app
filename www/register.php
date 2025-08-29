@@ -30,6 +30,44 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
         //Password meets rules. Check if already in database.
         //TODO: query database to see if password is unique, if so,
         //upload to data base and redirect user to sign in page.
+        $sql = "SELECT id FROM users WHERE username = '" . $usernameEntered . "';";
+        $statement = $pdo->query($sql);
+        if($statement) {
+            if($statement->rowCount() == 1) {
+                //username already exist in database.
+                $userError = "Username is already taken.";
+            }
+        } else {
+            $userError = "Something went wrong while trying to validate your details. Please try again later.";
+        }
+    }
+
+    //Time to validate password.
+    $passwordEntered = trim($_POST["password"]);
+
+    if(empty($passwordEntered)) {
+        $userError = $userError . "\n" . "Please enter a password.";
+    } else if(strlen($passwordEntered) < 6) {
+        $userError = $userError . "\n" . "Password entered is too short. (Must be greater than 6 characters)";
+    } 
+
+    //Validate confirm password
+    $confirmPassword = trim($_POST["confirm_password"]);
+    if(empty($confirmPassword) || $confirmPassword != $passwordEntered) {
+        $userError = $userError . "\n" . "The password did not match.";
+    }
+
+    //If all checks passed and no error then create user
+    if(empty($userError)) {
+        $sql = "INSERT INTO users (username, password) VALUES ('". $usernameEntered . "','" . password_hash($passwordEntered, PASSWORD_DEFAULT) . "');";
+        $statement = $pdo->query($sql);
+
+        if($statement) {
+            //Account creation success. Redirect client.
+            header("location: index.php");
+        } else {
+            $userError = "Something went wrong when trying to create your account.\nPlease try again later.";
+        }
     }
 }
 

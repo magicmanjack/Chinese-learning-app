@@ -7,6 +7,7 @@ TODO:
     Get interface to upload to database.
 
 Future:
+    FSRS check for libraries.
     Implement secure storing of user passwords using hashing algorithm and salt.
 
 Rules:

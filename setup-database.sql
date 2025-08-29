@@ -1,5 +1,5 @@
 CREATE TABLE users (
     id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(50) NOT NULL UNIQUE,
-    password VARCHAR(50) NOT NULL
+    password VARCHAR(60) NOT NULL
 );
