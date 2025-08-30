@@ -1,8 +1,7 @@
 TODO:
     https://www.tutorialrepublic.com/php-tutorial/php-mysql-login-system.php
-    Continue following ^^ tutorial and implement user registration.
-
-    Add backend after submit button pressed. Mostly there. Check TODO in register.php
+    
+    Add logout function.
     
     Get interface to upload to database.
 
