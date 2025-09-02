@@ -72,6 +72,7 @@
         <link rel="stylesheet" href = "style.css">
     </head>
     <body>
+    
         <h2>Sign in</h2>
         <?php echo "<p class='error'>" . ((!empty($userError)) ? $userError : '') . "</p>"; ?>
         <form action="/login.php" method="post">
@@ -91,5 +92,6 @@
                 <input type="submit" value="Submit">
             </div>
         </form>
+        <p>Don't have an account? <a href="register.php">Register here</a></p>
     </body>
 </html>

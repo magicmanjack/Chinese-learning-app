@@ -53,7 +53,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if($statement) {
             //Account creation success. Redirect client.
-            header("location: index.php");
+            header("location: registration_success.html");
+            exit;
         } else {
             $userError = "Something went wrong when trying to create your account.\nPlease try again later.";
         }
@@ -69,6 +70,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
         <link rel="stylesheet" href = "style.css">
     </head>
     <body>
+        
         <h2>Sign up</h2>
         <p>
             You must first create an account
@@ -97,5 +99,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
                 <input type="submit" value="Submit">
             </div>
         </form>
+        <p>Already have an account? <a href="login.php">Sign in here</a></p>
     </body>
 </html>

@@ -3,3 +3,12 @@ CREATE TABLE users (
     username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(60) NOT NULL
 );
+
+CREATE TABLE words (
+    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    owner_id INT NOT NULL,
+    hanzi VARCHAR(255),
+    pinyin VARCHAR(255),
+    english VARCHAR(255)
+);
+

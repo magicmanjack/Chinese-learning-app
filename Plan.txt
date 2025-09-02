@@ -1,8 +1,7 @@
 TODO:
     https://www.tutorialrepublic.com/php-tutorial/php-mysql-login-system.php
     
-    Add logout function.
-    
+    Start adding meat and potatoes.
     Get interface to upload to database.
 
 Future:
