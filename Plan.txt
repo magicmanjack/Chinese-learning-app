@@ -1,12 +1,12 @@
 TODO:
     https://www.tutorialrepublic.com/php-tutorial/php-mysql-login-system.php
-    
-    Start adding meat and potatoes.
-    Get interface to upload to database.
+
+    Work on practice1 area. Add checking of answers. Maybe client side.
+    3rd server:
+        perhaps serve extra application content e.g. pinyin suggestions.
 
 Future:
     FSRS check for libraries.
-    Implement secure storing of user passwords using hashing algorithm and salt.
 
 Rules:
     Needs to operate on at least 3 different machines.

@@ -19,9 +19,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
         //Password meets rules. Check if already in database.
         //TODO: query database to see if password is unique, if so,
         //upload to data base and redirect user to sign in page.
-        $sql = "SELECT id FROM users WHERE username = '" . $usernameEntered . "';";
-        $statement = $pdo->query($sql);
-        if($statement) {
+        $sql = "SELECT id FROM users WHERE username = :username;";
+        $statement = $pdo->prepare($sql);
+        $statement->bindParam(":username", $usernameEntered, PDO::PARAM_STR);
+
+        if($statement->execute()) {
             if($statement->rowCount() == 1) {
                 //username already exist in database.
                 $userError = "Username is already taken.";
@@ -48,10 +50,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 
     //If all checks passed and no error then create user
     if(empty($userError)) {
-        $sql = "INSERT INTO users (username, password) VALUES ('". $usernameEntered . "','" . password_hash($passwordEntered, PASSWORD_DEFAULT) . "');";
-        $statement = $pdo->query($sql);
+        $sql = "INSERT INTO users (username, password) VALUES (:username, :password);";
+        $statement = $pdo->prepare($sql);
+        $statement->bindParam(":username", $usernameEntered, PDO::PARAM_STR);
+        $statement->bindParam(":password", password_hash($passwordEntered, PASSWORD_DEFAULT), PDO::PARAM_STR);
+        
 
-        if($statement) {
+        if($statement->execute()) {
             //Account creation success. Redirect client.
             header("location: registration_success.html");
             exit;

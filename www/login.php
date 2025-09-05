@@ -34,9 +34,11 @@
         //validate
 
         if(empty($userError)) {
-            $sql = "SELECT id, username, password FROM users WHERE username = '" . $username . "';";
-            $statement = $pdo->query($sql);
-            if($statement) {
+            $sql = "SELECT id, username, password FROM users WHERE username = :username;";
+            $statement = $pdo->prepare($sql);
+            $statement->bindParam(":username", $username);
+
+            if($statement->execute()) {
                 if($statement->rowCount() == 1) {
                     //Username exists. Check password.
                     $row = $statement->fetch();
