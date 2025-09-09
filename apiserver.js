@@ -1,3 +1,8 @@
+/**
+ * Uses publicly available node.js module pinyin (MIT license)
+ * https://pinyin.js.org/en-US
+ */
+
 const express = require('express')
 const {pinyin} = require('pinyin')
 const app = express()

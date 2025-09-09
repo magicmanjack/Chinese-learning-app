@@ -50,3 +50,13 @@ Chinese Learning tool:
     2nd VM. Database. Account data.
     3rd VM function - Figure out later. Pinyin options？ 
     
+    Report points:
+        Attribute pinyin module somewhere.
+        Justify the importance and benefits of using seperate VMs 
+        rather than just one server
+
+        Explain what software components your build process will
+        download for a clean first time build and subsequent redeployemnet.
+
+        Two types of change that a dev might make to your repo and how to
+        rebuild and run.

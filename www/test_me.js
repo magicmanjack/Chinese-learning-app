@@ -1,5 +1,5 @@
 function startPractice() {
-    //Send POST request to the server indicating practice start.
+    //Send GET request to the server indicating practice start.
     let url = '/practice1.php';
 
     fetch(url).then(res => {

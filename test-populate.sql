@@ -1,0 +1,2 @@
+INSERT INTO words (owner_id, hanzi, pinyin, english) VALUES (1, '你好吗', 'nǐhǎoma', 'How are you?');
+INSERT INTO words (owner_id, hanzi, pinyin, english) VALUES (1, '今天天气很好', 'jīntiān tiānqì hěn hǎo','Todays weather is very good');
