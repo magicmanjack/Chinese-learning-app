@@ -39,6 +39,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
     <head>
         <title>Add words</title>
         <link rel="stylesheet" href="style.css">
+        <script src="get_pinyin.js"></script>
     </head>
     <body>
         <h3>Add new words</h3>
@@ -49,24 +50,37 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
             div.side-by-side {
                 width: 80vw;
             }
-            div.side-by-side div {
+            div.side-by-side > div {
                 padding: 0 0;
                 width:33%;
+                height:10vw;
                 float:left;
             }
+            div.add-words-label {
+                height:3vw;
+            }
+
+          
         </style>
         <form action="/add_words.php" method="post">
             <div class="side-by-side">
                 <div>
-                    <lable for="hanzi">hànzì</lable>
+                    <div class="add-words-label">
+                        <lable for="hanzi">hànzì</lable>
+                    </div>
                     <input type="text" id="hanzi" name="hanzi">
                 </div>
                 <div>
-                    <lable for="pinyin">pīnyīn</lable>
+                    <div class="add-words-label">
+                        <lable for="pinyin">pīnyīn</lable>
+                        <input type="button" id="auto-fill-button" value="Auto fill" onclick="get_pinyin()">
+                    </div>
                     <input type="text" id="pinyin" name="pinyin">
                 </div>
                 <div>
-                    <lable for="english">english</lable>
+                    <div class="add-words-label">
+                        <lable for="english">english</lable>
+                    </div>
                     <input type="text" id="english" name="english">
                 </div>
             </div>

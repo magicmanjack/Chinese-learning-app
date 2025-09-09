@@ -100,4 +100,15 @@ Vagrant.configure("2") do |config|
     dbserver.vm.provision "shell", path: "provision-dbserver.sh"
   end
 
+  config.vm.define "apiserver" do |apiserver|
+    
+    apiserver.vm.hostname = "apiserver"
+
+    apiserver.vm.network "private_network", ip:"192.168.2.13"
+
+    apiserver.vm.synced_folder ".", "/vagrant", owner: "vagrant", group: "vagrant", mount_options: ["dmode=775,fmode=777"]
+
+    apiserver.vm.provision "shell", path: "provision-apiserver.sh"
+  end
+
 end

@@ -48,8 +48,17 @@ form {
 }
 
 input[type="text"], input[type="password"] {
-    width: 100%;
+    width: 95%;
     font-size: 3.2vw;
+}
+
+input#auto-fill-button {
+    font-size: calc(var(--font-scale) * 3vw)
+}
+
+lable {
+    padding-block: 3px;
+    padding-inline: 6px;
 }
 
 input[type="submit"] {

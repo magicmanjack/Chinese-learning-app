@@ -1,9 +1,11 @@
 TODO:
     https://www.tutorialrepublic.com/php-tutorial/php-mysql-login-system.php
 
-    Work on practice1 area. Add checking of answers. Maybe client side.
+    DO LATER -->Work on practice1 area. Add checking of answers. Maybe client side.
+
     3rd server:
-        perhaps serve extra application content e.g. pinyin suggestions.
+        TODO - Change provision so that it does not hold up.
+        Check get requests 
 
 Future:
     FSRS check for libraries.
