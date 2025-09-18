@@ -1,11 +1,8 @@
 TODO:
     https://www.tutorialrepublic.com/php-tutorial/php-mysql-login-system.php
 
-    DO LATER -->Work on practice1 area. Add checking of answers. Maybe client side.
-
-    3rd server:
-        TODO - Change provision so that it does not hold up.
-        Check get requests 
+    Add javascript program that directs the practice area.
+    Instead of surrounding input with form, you can actually just leave them seperate.
 
 Future:
     FSRS check for libraries.

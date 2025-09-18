@@ -72,6 +72,10 @@ form div {
     padding: 0.5vw 0.5vw;
 }
 
+input.test-me-text-box {
+    width:50vw;
+}
+
 .error {
     color:red;
 }
