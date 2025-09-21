@@ -1,10 +1,13 @@
 TODO:
-    https://www.tutorialrepublic.com/php-tutorial/php-mysql-login-system.php
+    
 
-    Work on practice area. Get Check answers button working. 
+    
 
 Future:
+    Use a sentence transformer to compare similiar sentences. Read into apache2.0 license. https://github.com/UKPLab/sentence-transformers/tree/master
+
     FSRS check for libraries.
+
 
 Rules:
     Needs to operate on at least 3 different machines.
