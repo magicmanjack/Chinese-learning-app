@@ -1,8 +1,7 @@
 TODO:
     https://www.tutorialrepublic.com/php-tutorial/php-mysql-login-system.php
 
-    Add javascript program that directs the practice area.
-    Instead of surrounding input with form, you can actually just leave them seperate.
+    Work on practice area. Get Check answers button working. 
 
 Future:
     FSRS check for libraries.

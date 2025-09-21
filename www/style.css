@@ -84,13 +84,22 @@ input.test-me-text-box {
     color:green;
 }
 
-div#top-bar {
+div.wrong-answer {
+    background-color: lightcoral;
+}
 
+div.right-answer {
+    background-color: lightgreen;
 }
 
 div#top-bar * {
     margin:0;
     padding: 0px;
     
+}
+
+div#content-area > div {
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 

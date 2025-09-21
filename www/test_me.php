@@ -25,7 +25,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST") {
     <body>
         <h5>Practice</h5>
         <div id="content-area">
-            <button type="button" onclick="startPractice()"> Start </button>
+            <button type="button" onclick="startPractice()" id="start-button"> Start </button>
         </div>
     </body>
 </html>
