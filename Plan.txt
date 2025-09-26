@@ -1,5 +1,9 @@
 TODO:
-    
+    First figure how what charset pinyin uses.
+    Add pinyin test for words less than 4 characters. Present 1 word at a time.
+    Goes through and highlights each character. You type 1, 2, 3, 4 or click the button corrosponding to the tone.
+
+
 
     
 

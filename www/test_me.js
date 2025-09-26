@@ -1,3 +1,24 @@
+//Only have to deal with letters a e i o u ü
+const tonedVowels = 
+    ['ā', 'á', 'ǎ', 'à',
+     'ē', 'é', 'ě', 'è',
+     'ī', 'í', 'ǐ', 'ì',
+     'ō', 'ó', 'ǒ', 'ò',
+     'ū', 'ú', 'ǔ', 'ù',
+     'ǖ', 'ǘ', 'ǚ', 'ǜ'];
+const nonTonedVowels = ['a', 'e', 'i', 'o', 'u', 'ü'];
+
+function removeTone(p) {
+    //Removes tone from pinyin
+    if(!tonedVowels.includes(p)) {
+        return p;
+    }
+    
+    return nonTonedVowels[Math.floor(tonedVowels.indexOf(p) / 4)];
+}
+
+let debug;
+
 function startPractice() {
     //Send GET request to the server indicating practice start.
     let url = '/get_practice_hanzi.php';
@@ -59,7 +80,7 @@ function startPractice() {
             const next = document.createElement("button");
             next.type = "button";
             next.textContent = "Lets go";
-            next.onclick = nextPhase;
+            next.onclick = phase2;
 
             document.getElementById("content-area").appendChild(p);
             document.getElementById("content-area").appendChild(next);
@@ -72,11 +93,11 @@ function startPractice() {
             //All were correct
             document.getElementById("check-answers-button").parentNode.remove();
             const p = document.createElement("p");
-            p.textContent = "Nice work!";
+            p.textContent = "Nice work! Now lets try the pīnyīn";
             const next = document.createElement("button");
             next.type = "button";
-            next.textContent = "Try new set";
-            next.onclick = startPractice;
+            next.textContent = "Lets go";
+            next.onclick = phase3;
 
             document.getElementById("content-area").appendChild(p);
             document.getElementById("content-area").appendChild(next);
@@ -120,7 +141,7 @@ function startPractice() {
         }
     }
 
-    function nextPhase() {
+    function phase2() {
         //User has to translate from english to 汉字
 
         //Extract user inputs from last phase
@@ -151,6 +172,45 @@ function startPractice() {
 
 
     }
+
+    
+    function phase3() {
+        //Test the users pinyin
+
+        //Clear everything
+        content.innerHTML = "";
+
+        const instructions = document.createElement("p");
+        instructions.textContent = "Select the correct tone for the pīnyīn"
+        content.appendChild(instructions);
+
+        const div = document.createElement("div");
+        const toTest = document.createElement("p");
+
+        // Iterate through and assign ids to each tonal letter
+        let p = pinyin[0];
+
+        let id = 0;
+        for(let i = 0; i < p.length; i++) {
+            
+            if(tonedVowels.includes(p[i])) {
+                //Contains tone 
+                //console.log(`character ${p[i]} is value toned. -> ${removeTone(p[i])}`);
+                p = p.replace(p[i], `<span id=char${id}>` + removeTone(p[i]) + "</span>");
+                id++;
+            }
+            
+        }
+
+        toTest.innerHTML = p;
+
+        toTest.id = "test-pinyin";
+
+        div.appendChild(toTest);
+        content.appendChild(div);
+
+    }
+    debug = phase3;
 
 }
 

@@ -103,3 +103,15 @@ div#content-area > div {
     margin-bottom: 5px;
 }
 
+p#test-pinyin {
+    font-size: 5vw;
+}
+
+p#test-pinyin * {
+    font-size: 5vw;
+}
+
+.highlight {
+    background-color: orange;
+}
+
