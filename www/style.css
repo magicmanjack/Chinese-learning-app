@@ -115,3 +115,24 @@ p#test-pinyin * {
     background-color: orange;
 }
 
+.button-div * {
+    width: 7%;
+}
+
+.pinyin-div * {
+    margin: 0;
+}
+
+.img-button {
+    background: none;
+    padding:0;
+    border:0;
+}
+
+.img-button img {
+    
+    width: 100%;
+}
+
+
+

@@ -17,6 +17,14 @@ function removeTone(p) {
     return nonTonedVowels[Math.floor(tonedVowels.indexOf(p) / 4)];
 }
 
+function addTone(vowel, toneNumber) {
+    if(!nonTonedVowels.includes(vowel)) {
+        return vowel;
+    }
+
+    return tonedVowels[nonTonedVowels.indexOf(vowel) * 4 + toneNumber - 1];
+}
+
 let debug;
 
 function startPractice() {
@@ -173,6 +181,7 @@ function startPractice() {
 
     }
 
+
     
     function phase3() {
         //Test the users pinyin
@@ -184,7 +193,48 @@ function startPractice() {
         instructions.textContent = "Select the correct tone for the pīnyīn"
         content.appendChild(instructions);
 
+        //Add row of buttons
+        const buttonDiv = document.createElement("div");
+        buttonDiv.classList.add("button-div");
+
+        toneButtons = [];
+
+        for(let i = 1; i < 5; i++) {
+            const tone = document.createElement("button");
+            tone.type="button";
+            tone.classList.add("img-button");
+            tone.id = `tone${i}`;
+            tone.onclick = () => {
+                //Go through and find highlighted character
+                for(let j = 0; document.getElementById(`char${j}`); j++) {
+                    const c = document.getElementById(`char${j}`);
+                    if(c.classList.contains("highlight")) {
+                        //Found current highlighted character span. Need to unhighlight
+                        c.classList.remove("highlight");
+                        //Convert to tone
+                        c.textContent = addTone(c.textContent, i);
+                        if(document.getElementById(`char${j + 1}`)) {
+                            // If wasn't last character then highlight next
+                            document.getElementById(`char${j + 1}`).classList.add("highlight");
+                        }
+
+                        break;
+                    }
+                }
+            }
+            const img = document.createElement("img");
+            img.src = `res/button${i}.png`;
+            tone.appendChild(img);
+            toneButtons.push(tone);
+            buttonDiv.appendChild(tone);
+        }
+
+        content.appendChild(buttonDiv);
+
+
+        //Now to add pinyin
         const div = document.createElement("div");
+        div.classList.add("pinyin-div");
         const toTest = document.createElement("p");
 
         // Iterate through and assign ids to each tonal letter
@@ -208,6 +258,9 @@ function startPractice() {
 
         div.appendChild(toTest);
         content.appendChild(div);
+
+        //Highlight first character to be toned
+        document.getElementById(`char${0}`).classList.add("highlight");
 
     }
     debug = phase3;

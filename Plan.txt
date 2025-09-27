@@ -1,6 +1,5 @@
 TODO:
-    First figure how what charset pinyin uses.
-    Add pinyin test for words less than 4 characters. Present 1 word at a time.
+    Change the buttons to this: https://www.tutorialrepublic.com/faq/how-to-embed-image-in-a-button-element-in-html.php
     Goes through and highlights each character. You type 1, 2, 3, 4 or click the button corrosponding to the tone.
 
 
