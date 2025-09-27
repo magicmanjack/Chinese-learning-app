@@ -25,6 +25,26 @@ function addTone(vowel, toneNumber) {
     return tonedVowels[nonTonedVowels.indexOf(vowel) * 4 + toneNumber - 1];
 }
 
+function checkDifferences(original, answer) {
+    /*
+    Checks differences between the original string 
+    and the users input and returns an array of indices indicating where they differ
+    */
+    if(original.length != answer.length) {
+        console.error("Answer provided is different length to original!");
+    }
+
+    const indices = [];
+
+    for(let i = 0; i < original.length; i++) {
+        if(original[i] != answer[i]) {
+            indices.push(i);
+        }
+    }
+
+    return indices;
+}
+
 let debug;
 
 function startPractice() {
@@ -185,6 +205,7 @@ function startPractice() {
     
     function phase3() {
         //Test the users pinyin
+        let pinyinIndex = 0; // Start off with testing first pinyin
 
         //Clear everything
         content.innerHTML = "";
@@ -216,6 +237,34 @@ function startPractice() {
                         if(document.getElementById(`char${j + 1}`)) {
                             // If wasn't last character then highlight next
                             document.getElementById(`char${j + 1}`).classList.add("highlight");
+                        } else {
+                            //Finished so check correctness
+                            const nodes = document.getElementById("test-pinyin").childNodes;
+                            let answerString = "";
+                            nodes.forEach((node) => {
+                                //Accumulate nodes into string
+                                answerString = answerString + node.textContent;
+        
+                            });
+                            const diff = checkDifferences(pinyin[pinyinIndex], answerString);
+                            //console.log(diff);
+                            const p = pinyin[pinyinIndex];
+                            let toTest = "";
+
+                            let id = 0;
+                            for(let k = 0; k < p.length; k++) {
+                                //Recreate test pinyin, highlighting red the wrong characters
+                                if(diff.includes(k)) {
+                                    //report wrong
+                                    toTest = toTest + `<span id='char${id}', class='error'>` + p[k] + "</span>";
+                                } else {
+                                    toTest = toTest + p[k];
+                                }
+                            }
+
+                            document.getElementById("test-pinyin").innerHTML = toTest;
+
+
                         }
 
                         break;
@@ -238,8 +287,7 @@ function startPractice() {
         const toTest = document.createElement("p");
 
         // Iterate through and assign ids to each tonal letter
-        let p = pinyin[0];
-
+        let p = pinyin[pinyinIndex];
         let id = 0;
         for(let i = 0; i < p.length; i++) {
             
