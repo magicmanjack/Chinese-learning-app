@@ -84,11 +84,32 @@ input.test-me-text-box {
     color:green;
 }
 
-div.wrong-answer {
+.right-answer-box {
+    padding: 6px;
+    border: 5px solid lightgreen;
+    font-weight: bold;
+}
+
+.right-answer-box button {
+    margin-left: 3px;
+}
+
+.wrong-answer-box {
+    padding: 6px;
+    border: 5px solid lightcoral;
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.wrong-answer-box button {
+    margin-left: 3px;
+}
+
+.wrong-answer {
     background-color: lightcoral;
 }
 
-div.right-answer {
+.right-answer {
     background-color: lightgreen;
 }
 
@@ -103,11 +124,11 @@ div#content-area > div {
     margin-bottom: 5px;
 }
 
-p#test-pinyin {
+#test-pinyin {
     font-size: 5vw;
 }
 
-p#test-pinyin * {
+#test-pinyin * {
     font-size: 5vw;
 }
 
@@ -133,6 +154,7 @@ p#test-pinyin * {
     
     width: 100%;
 }
+
 
 
 

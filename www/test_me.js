@@ -125,7 +125,7 @@ function startPractice() {
             const next = document.createElement("button");
             next.type = "button";
             next.textContent = "Lets go";
-            next.onclick = phase3;
+            next.onclick = () => (phase3(0));
 
             document.getElementById("content-area").appendChild(p);
             document.getElementById("content-area").appendChild(next);
@@ -203,9 +203,8 @@ function startPractice() {
 
 
     
-    function phase3() {
+    function phase3(pinyinIndex=0) {
         //Test the users pinyin
-        let pinyinIndex = 0; // Start off with testing first pinyin
 
         //Clear everything
         content.innerHTML = "";
@@ -233,7 +232,14 @@ function startPractice() {
                         //Found current highlighted character span. Need to unhighlight
                         c.classList.remove("highlight");
                         //Convert to tone
+                        if(tonedVowels.includes(c.textContent)) {
+                            //Occurs when the user gets the answer wrong and retrys.
+                            // Need to convert back to non toned first.
+                            c.textContent = removeTone(c.textContent); 
+                        }
+
                         c.textContent = addTone(c.textContent, i);
+
                         if(document.getElementById(`char${j + 1}`)) {
                             // If wasn't last character then highlight next
                             document.getElementById(`char${j + 1}`).classList.add("highlight");
@@ -248,22 +254,88 @@ function startPractice() {
                             });
                             const diff = checkDifferences(pinyin[pinyinIndex], answerString);
                             //console.log(diff);
-                            const p = pinyin[pinyinIndex];
+                            if(diff.length == 0) {
+                                //User entered answer correctly
+                                
+                                document.getElementById("test-pinyin").classList.add("right-answer");
+                                const div = document.createElement("div");
+                                const sp = document.createElement("span");
+
+                                sp.classList.add("right-answer-box");
+
+                                if(pinyinIndex + 1 >= pinyin.length) {
+                                    //If finished all the pinyin.
+                                    sp.innerText = "Finished! ";
+                                    const retryButton = document.createElement("button");
+                                    retryButton.type = "button";
+                                    retryButton.textContent = "New set";
+                                    retryButton.onclick = startPractice;
+
+                                    const homeButton = document.createElement("button");
+                                    homeButton.type = "button";
+                                    homeButton.textContent = "Home";
+                                    homeButton.onclick = () => {window.location = "/home.php"};
+
+                                    sp.appendChild(retryButton);
+                                    sp.appendChild(homeButton);
+                                } else {
+                                    sp.innerText = "Correct!";
+                                    const nextWordButton = document.createElement("button");
+                                    nextWordButton.type = "button";
+                                    nextWordButton.textContent = "Next";
+                                    nextWordButton.onclick = () => {phase3(pinyinIndex+1)};
+                                    sp.appendChild(nextWordButton);
+                                }
+                                
+
+                                div.appendChild(sp);
+                                content.append(div);
+                                return;
+                            }
+
                             let toTest = "";
 
                             let id = 0;
-                            for(let k = 0; k < p.length; k++) {
+                            for(let k = 0; k < answerString.length; k++) {
                                 //Recreate test pinyin, highlighting red the wrong characters
                                 if(diff.includes(k)) {
                                     //report wrong
-                                    toTest = toTest + `<span id='char${id}', class='error'>` + p[k] + "</span>";
+                                    toTest = toTest + `<span id='char${id}', class='wrong-answer'>` + answerString[k] + "</span>";
+                                    id++;
                                 } else {
-                                    toTest = toTest + p[k];
+                                    toTest = toTest + answerString[k];
                                 }
                             }
 
                             document.getElementById("test-pinyin").innerHTML = toTest;
+                            
+                            const div = document.createElement("div");
+                            div.id = "wrong-answer-div"
+                            const sp = document.createElement("span");
+                            
+                            sp.innerText= "Not quite. Try fix the mistakes.";
+                            sp.classList.add("wrong-answer-box");
+                            div.appendChild(sp);
 
+                            const fixButton = document.createElement("button");
+                            fixButton.type = "button";
+                            fixButton.textContent = "Fix mistakes"
+                            fixButton.onclick = () => {
+                                //Remove error and wrong-answer div
+                                document.getElementById("test-pinyin").childNodes.forEach((n) => {
+                                    if(n.classList && n.classList.contains("wrong-answer")) {
+                                        n.classList.remove("wrong-answer");
+                                    }
+                                })
+                                document.getElementById("wrong-answer-div").remove();
+
+                                //Set first char to be highlighted
+                                document.getElementById("char0").classList.add("highlight");
+
+                            };
+                            sp.appendChild(fixButton);
+
+                            content.append(div);
 
                         }
 
@@ -284,9 +356,10 @@ function startPractice() {
         //Now to add pinyin
         const div = document.createElement("div");
         div.classList.add("pinyin-div");
-        const toTest = document.createElement("p");
+        const toTest = document.createElement("span");
 
         // Iterate through and assign ids to each tonal letter
+        console.log(pinyinIndex);
         let p = pinyin[pinyinIndex];
         let id = 0;
         for(let i = 0; i < p.length; i++) {

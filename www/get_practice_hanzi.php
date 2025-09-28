@@ -12,7 +12,7 @@
 
 
 {"hanzi":[ <?php 
-    $sql = "SELECT * FROM words WHERE owner_id=:id ORDER BY RAND() LIMIT 1;";
+    $sql = "SELECT * FROM words WHERE owner_id=:id ORDER BY RAND() LIMIT 3;";
     $statement = $pdo->prepare($sql);
     $statement->bindParam(":id", $id, PDO::PARAM_STR);
 
