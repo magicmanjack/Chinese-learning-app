@@ -10,6 +10,7 @@ For assignment 2:
 
 
     HTTPS! Let's Encrypt, launched in April 2016,[28] provides free
+    Look into directory owner and group and what is most secure.
 
     Need to either implement aws lambda application logic or add a non ec2 cloud service.
     Ideas:
