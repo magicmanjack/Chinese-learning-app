@@ -86,7 +86,7 @@ Vagrant.configure("2") do |config|
     webserver.vm.synced_folder ".", "/vagrant", owner: "vagrant", group: "vagrant", mount_options: ["dmode=775,fmode=777"]
 
     #provisioning
-    webserver.vm.provision "shell", path: "provision-webserver.sh"
+    webserver.vm.provision "shell", path: "provision-webserver-vagrant.sh"
   end
 
   config.vm.define "dbserver" do |dbserver|
@@ -97,7 +97,7 @@ Vagrant.configure("2") do |config|
     
     dbserver.vm.synced_folder ".", "/vagrant", owner: "vagrant", group: "vagrant", mount_options: ["dmode=775,fmode=777"]
 
-    dbserver.vm.provision "shell", path: "provision-dbserver.sh"
+    dbserver.vm.provision "shell", path: "provision-dbserver-vagrant.sh"
   end
 
   config.vm.define "apiserver" do |apiserver|
@@ -108,7 +108,7 @@ Vagrant.configure("2") do |config|
 
     apiserver.vm.synced_folder ".", "/vagrant", owner: "vagrant", group: "vagrant", mount_options: ["dmode=775,fmode=777"]
 
-    apiserver.vm.provision "shell", path: "provision-apiserver.sh"
+    apiserver.vm.provision "shell", path: "provision-apiserver-vagrant.sh"
   end
 
 end

@@ -1,10 +1,27 @@
 TODO:
-    Report correctness of pinyin. Highlight red incorrect ones
-    Show fix button -> Goes into restarting but only for incorrect ones.
+    For the pinyin tone practice, display the hanzi above it
+    Add writing practice phase. Either seperate or connected to main phases.
+
+For assignment 2:
+    Need to deploy application to cloud:
+        Copy the vagrant configuration files such that they work for terraform provision
+        E.g. add sudos and remove &
+        Probably a good idea to move everything needed for provision into its own directory and then the provisioning scripts outside of that.
+
+
+    HTTPS! Let's Encrypt, launched in April 2016,[28] provides free
+
+    Need to either implement aws lambda application logic or add a non ec2 cloud service.
+    Ideas:
+
     
 
 
-
+Bugs：
+    Empty entries are allowed in the add words. 
+        If an entry is empty than need to skip it in the testing phase.
+        If not at least two entries filled out, don't allow user to add.
+    
     
 
 Future:

@@ -14,7 +14,7 @@ mkdir api_server
 
 cd api_server
 
-cp /vagrant/apiserver.js .
+cp /vagrant/api/apiserver.js .
 
 npm init -y
 

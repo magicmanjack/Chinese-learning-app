@@ -27,10 +27,10 @@ service mysql restart
 
 export MYSQL_PWD='aaftwup123!'
 #provision database
-cat /vagrant/setup-database.sql | mysql -u webuser test
+cat /vagrant/db/setup-database.sql | mysql -u webuser test
 
 #create testuser with password 
 wget -O /dev/null --post-data="username=testuser&password=testuser&confirm_password=testuser" 192.168.2.11:80/register.php
 
 # and add words to account.
-cat /vagrant/test-populate.sql | mysql -u webuser test
+cat /vagrant/db/test-populate.sql | mysql -u webuser test
