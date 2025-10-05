@@ -4,13 +4,16 @@ TODO:
 
 For assignment 2:
     Need to deploy application to cloud:
-        Copy the vagrant configuration files such that they work for terraform provision
-        E.g. add sudos and remove &
-        Probably a good idea to move everything needed for provision into its own directory and then the provisioning scripts outside of that.
+        For API server:
+            Create unit file and place in /etc/systemd/system/ 
+            unit file should execute a shell script which has been made with $(which node)
+        
 
 
     HTTPS! Let's Encrypt, launched in April 2016,[28] provides free
     Look into directory owner and group and what is most secure.
+    Avoid defining private IP addresses in the config files as they get checked into public repo
+    Look into using a secrets manager instead of using env variables to store db hostname.
 
     Need to either implement aws lambda application logic or add a non ec2 cloud service.
     Ideas:

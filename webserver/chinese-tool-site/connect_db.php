@@ -1,7 +1,7 @@
     <?php
     
         //Attempt to connect to db server
-        $dbServer = "192.168.2.12";
+        $dbServer = getenv("DB_HOSTNAME");
         $dbUsername = "webuser";
         $dbPassword = "aaftwup123!";
         $dbName = "test";

@@ -1,3 +1,9 @@
+locals {
+   web_server_priv = "172.31.26.161"
+   db_server_priv = "172.31.26.162"
+   api_server_priv = "172.31.26.163"
+}
+
 provider "aws" {
     region = "us-east-1"
 }
@@ -42,11 +48,51 @@ resource "aws_security_group" "allow_web" {
     }
 }
 
+resource "aws_security_group" "allow_mysql" {
+    name="allow_mysql"
+    description = "Allow mysql traffic"
+
+    ingress {
+        description =  "MySQL traffic from webserver"
+        from_port = 3306
+        to_port = 3306
+        protocol = "tcp"
+        cidr_blocks = ["172.31.26.161/32"]
+    }
+
+    egress {
+        from_port = 0
+        to_port = 0
+        protocol = "-1"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+}
+
+resource "aws_security_group" "allow_api" {
+    name="allow_api"
+    description = "Allow connections to the API server"
+
+    ingress {
+        description="Connections only allowed to API port and only from web server"
+        from_port=3000
+        to_port=3000
+        protocol="tcp"
+        cidr_blocks=["${local.web_server_priv}/32"]
+    }
+    egress {
+        from_port=0
+        to_port=0
+        protocol="-1"
+        cidr_blocks=["0.0.0.0/0"]
+    }
+}
+
 resource "aws_instance" "web_server" {
     ami = "ami-0360c520857e3138f"
     instance_type = "t2.micro"
     key_name = "cosc349-2024"
-
+    private_ip = local.web_server_priv
     vpc_security_group_ids = [aws_security_group.allow_ssh.id, aws_security_group.allow_web.id]
 
     connection {
@@ -62,11 +108,82 @@ resource "aws_instance" "web_server" {
         destination = "webserver"
     }
 
-    provisioner "remote-exec" {
-        script = "provision-webserver.sh"
+    provisioner "file" {
+      destination = "/home/ubuntu/prov.sh"
+      content = templatefile("${path.module}/provision-webserver.tftpl", {db_server_ip=local.db_server_priv, api_server_ip=local.api_server_priv})
     }
+
+    provisioner "remote-exec" {
+        inline = ["sh ~/prov.sh"]
+    }
+
 }
+
+resource "aws_instance" "db_server" {
+    ami = "ami-0360c520857e3138f"
+    instance_type = "t2.micro"
+    key_name = "cosc349-2024"
+    private_ip = local.db_server_priv
+
+    vpc_security_group_ids = [aws_security_group.allow_ssh.id, aws_security_group.allow_mysql.id]
+
+    connection {
+        type = "ssh"
+        user = "ubuntu"
+        host = self.public_ip
+        port = 22
+        private_key = file(pathexpand("~/.ssh/cosc349-2024.pem"))
+    }
+
+    provisioner "file" {
+        source = "db"
+        destination = "db"
+    }
+
+    provisioner "file" {
+      destination = "/home/ubuntu/prov.sh"
+      content = templatefile("${path.module}/provision-dbserver.tftpl", {web_server_ip=local.web_server_priv, db_server_ip=local.db_server_priv})
+    }
+
+    provisioner "remote-exec" {
+        inline = ["sh ~/prov.sh"]
+    }
+    
+}
+
+resource "aws_instance" "api_server" {
+    ami = "ami-0360c520857e3138f"
+    instance_type = "t2.micro"
+    key_name = "cosc349-2024"
+    private_ip = local.api_server_priv
+    vpc_security_group_ids = [aws_security_group.allow_ssh.id, aws_security_group.allow_api.id]
+
+    connection {
+        type = "ssh"
+        user = "ubuntu"
+        host = self.public_ip
+        port = 22
+        private_key = file(pathexpand("~/.ssh/cosc349-2024.pem"))
+    }
+
+    provisioner "file" {
+        source = "api"
+        destination = "api"
+    }
+
+    provisioner "remote-exec" {
+        scripts = [ "provision-apiserver.sh" ]
+    }
+
+}
+
 
 output "web_server_ip" {
     value = aws_instance.web_server.public_ip
+}
+output "db_server_ip" {
+    value = aws_instance.db_server.public_ip
+}
+output "api_server_ip" {
+    value = aws_instance.api_server.public_ip
 }

@@ -1,0 +1,21 @@
+#!/bin/bash
+
+sudo apt-get update
+sudo apt-get install -y apache2 libapache2-mod-php php php-mysql
+
+sudo mv webserver/website.conf /etc/apache2/sites-available/
+sudo mv webserver/chinese-tool-site /var/www/
+rm webserver
+
+sudo mkdir /etc/systemd/system/apache2.service.d
+
+echo "[Service]" | sudo tee -a /etc/systemd/system/apache2.service.d/override.conf > /dev/null
+echo "Environment='DB_HOSTNAME=${db_server_ip}'" | sudo tee -a /etc/systemd/system/apache2.service.d/override.conf > /dev/null
+echo "Environment='API_HOSTNAME=${api_server_ip}'" | sudo tee -a /etc/systemd/system/apache2.service.d/override.conf > /dev/null
+
+sudo systemctl daemon-reload
+
+sudo a2ensite website
+sudo a2dissite 000-default
+sudo service apache2 restart
+

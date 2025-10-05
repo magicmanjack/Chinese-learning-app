@@ -1,0 +1,36 @@
+#!/bin/bash
+
+sudo apt-get update
+
+#TODO: root user name and password. Insecure?
+export MYSQL_PWD='insecure_mysqlroot_pw'
+
+#prepopulate debconf database with answers to questions.
+echo "mysql-server mysql-server/root_password password $MYSQL_PWD" | sudo debconf-set-selections
+echo "mysql-server mysql-server/root_password_again password $MYSQL_PWD" | sudo debconf-set-selections
+
+sudo apt-get -y install mysql-server
+
+sudo service mysql start
+
+echo "CREATE DATABASE test;" | mysql -u root
+
+echo "CREATE USER 'webuser'@'%' IDENTIFIED BY 'aaftwup123!';" | mysql -u root
+
+echo "GRANT ALL PRIVILEGES ON test.* TO 'webuser'@'%';" | mysql -u root
+
+#Changing mysql config so that it listens on the static private ip
+sudo sed -i'' -e '/bind-address/s/127.0.0.1/${db_server_ip}/' /etc/mysql/mysql.conf.d/mysqld.cnf
+
+#Affect changes.
+sudo service mysql restart
+
+export MYSQL_PWD='aaftwup123!'
+#provision database
+cat ~/db/setup-database.sql | mysql -u webuser test
+
+#create testuser with password 
+wget -O /dev/null --post-data="username=testuser&password=testuser&confirm_password=testuser" ${web_server_ip}:80/register.php
+
+# and add words to account.
+cat ~/db/test-populate.sql | mysql -u webuser test

@@ -1,5 +1,5 @@
 <?php 
-    $API = "http://192.168.2.13:3000/";
+    $API = "http://" . getenv("API_HOSTNAME") . ":3000/";
 
     session_start();
     if(!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] == false) {
