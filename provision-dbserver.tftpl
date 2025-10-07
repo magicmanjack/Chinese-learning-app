@@ -34,3 +34,26 @@ wget -O /dev/null --post-data="username=testuser&password=testuser&confirm_passw
 
 # and add words to account.
 cat ~/db/test-populate.sql | mysql -u webuser test
+
+# Download and install aws cli for s3 bucket usage.
+sudo apt-get install unzip
+
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+
+#Create credentials directory ready to recieve credentials
+mkdir ~/.aws
+
+#Create metrics update script to be ran on a regular interval.
+cat << EOF > update_metrics.sh
+#! /bin/bash
+cd /home/ubuntu
+export MYSQL_PWD='aaftwup123!'
+echo "SELECT COUNT(*) FROM users" | mysql -u webuser test | tail -n +2 > out_temp.txt
+aws s3 cp out_temp.txt s3://${metrics_bucket}/number.txt
+EOF
+
+sudo chmod 776 update_metrics.sh
+
+echo "*/1 * * * * ubuntu /home/ubuntu/update_metrics.sh" | sudo tee -a /etc/crontab

@@ -3,10 +3,11 @@ TODO:
     Add writing practice phase. Either seperate or connected to main phases.
 
 For assignment 2:
-    Need to deploy application to cloud:
-        For API server:
-            Create unit file and place in /etc/systemd/system/ 
-            unit file should execute a shell script which has been made with $(which node)
+
+    YOU DUMB IDIOT! It works. Access policy is unclear but it works.
+    db and webserver send analytic data to s3 bucket.
+    lambda API gateway to fetch data and return it in a nice fashion.E.g. html.
+    Modify API already created.
         
 
 

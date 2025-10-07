@@ -8,6 +8,51 @@ provider "aws" {
     region = "us-east-1"
 }
 
+resource "aws_s3_bucket" "metrics_bucket" {
+    bucket = "jack-bredenbecks-metrics-bucket"
+    force_destroy = true
+}
+
+/*
+Lambda function configuration.
+Firstly uploads lambda to s3 bucket.
+*/
+
+data "archive_file" "lambda_get_metrics" {
+    type = "zip"
+
+    source_dir = "${path.module}/lambda/get_metrics"
+    output_path = "${path.module}/lambda/get_metrics.zip"
+}
+
+resource "aws_s3_object" "lambda_get_metrics" {
+    bucket = aws_s3_bucket.metrics_bucket.id
+
+    key = "get_metrics.zip"
+    source = data.archive_file.lambda_get_metrics.output_path
+
+    etag= filemd5(data.archive_file.lambda_get_metrics.output_path)
+}
+
+resource "aws_lambda_function" "get_metrics" {
+    function_name="GetMetrics"
+    s3_bucket = aws_s3_bucket.metrics_bucket.id
+    s3_key = aws_s3_object.lambda_get_metrics.key
+
+    runtime="nodejs20.x"
+    handler="get_metrics.handler"
+
+    source_code_hash = data.archive_file.lambda_get_metrics.output_base64sha256
+    /* forced to use this role as do not access to create role policy.*/
+    role = "arn:aws:iam::781024672893:role/LabRole"
+}
+
+
+/*
+Security groups
+*/
+
+
 resource "aws_security_group" "allow_ssh" {
     name = "allow_ssh"
     description = "Allow inbound ssh traffic"
@@ -142,11 +187,17 @@ resource "aws_instance" "db_server" {
 
     provisioner "file" {
       destination = "/home/ubuntu/prov.sh"
-      content = templatefile("${path.module}/provision-dbserver.tftpl", {web_server_ip=local.web_server_priv, db_server_ip=local.db_server_priv})
+      content = templatefile("${path.module}/provision-dbserver.tftpl", {web_server_ip=local.web_server_priv, db_server_ip=local.db_server_priv, metrics_bucket=aws_s3_bucket.metrics_bucket.bucket})
     }
 
     provisioner "remote-exec" {
         inline = ["sh ~/prov.sh"]
+    }
+
+    //Copys aws credentials over to db server. Not perfect but works. 
+    provisioner "file" {
+      source = pathexpand("~/.aws/credentials")
+      destination = "/home/ubuntu/.aws/credentials"
     }
     
 }
@@ -177,6 +228,10 @@ resource "aws_instance" "api_server" {
 
 }
 
+output "function_name" {
+    description = "Name of the lambda function"
+    value = aws_lambda_function.get_metrics.function_name
+}
 
 output "web_server_ip" {
     value = aws_instance.web_server.public_ip
