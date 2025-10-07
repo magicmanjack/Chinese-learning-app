@@ -7,6 +7,8 @@ sudo mv webserver/website.conf /etc/apache2/sites-available/
 sudo mv webserver/chinese-tool-site /var/www/
 rm webserver
 
+
+#Store hostname of database and api as variables that the apache2 service will get, so they can be accessed in PHP scripts.
 sudo mkdir /etc/systemd/system/apache2.service.d
 
 echo "[Service]" | sudo tee -a /etc/systemd/system/apache2.service.d/override.conf > /dev/null
@@ -15,6 +17,7 @@ echo "Environment='API_HOSTNAME=${api_server_ip}'" | sudo tee -a /etc/systemd/sy
 
 sudo systemctl daemon-reload
 
+#Enable website
 sudo a2ensite website
 sudo a2dissite 000-default
 sudo service apache2 restart

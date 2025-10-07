@@ -47,6 +47,69 @@ resource "aws_lambda_function" "get_metrics" {
     role = "arn:aws:iam::781024672893:role/LabRole"
 }
 
+/*
+API Gateway. 
+*/
+
+resource "aws_apigatewayv2_api" "metrics_gw_api" {
+    name = "metrics_gw_api"
+    protocol_type = "HTTP"
+}
+
+resource "aws_apigatewayv2_stage" "default" {
+    api_id =  aws_apigatewayv2_api.metrics_gw_api.id
+    name = "$default"
+    auto_deploy = true
+    access_log_settings {
+      destination_arn = aws_cloudwatch_log_group.api_gw.arn
+
+      format = jsonencode({
+            requestId               = "$context.requestId"
+            sourceIp                = "$context.identity.sourceIp"
+            requestTime             = "$context.requestTime"
+            protocol                = "$context.protocol"
+            httpMethod              = "$context.httpMethod"
+            resourcePath            = "$context.resourcePath"
+            routeKey                = "$context.routeKey"
+            status                  = "$context.status"
+            responseLength          = "$context.responseLength"
+            integrationErrorMessage = "$context.integrationErrorMessage"})
+    }
+}
+
+resource "aws_apigatewayv2_integration" "get_metrics" {
+    api_id = aws_apigatewayv2_api.metrics_gw_api.id
+    integration_uri = aws_lambda_function.get_metrics.invoke_arn
+    integration_type = "AWS_PROXY"
+    integration_method = "POST"
+}
+
+resource "aws_apigatewayv2_route" "get_metrics" {
+    api_id = aws_apigatewayv2_api.metrics_gw_api.id
+    route_key = "GET /get-metrics"
+    target = "integrations/${aws_apigatewayv2_integration.get_metrics.id}"
+}
+
+resource "aws_cloudwatch_log_group" "api_gw" {
+  name = "/aws/api_gw/${aws_apigatewayv2_api.metrics_gw_api.name}"
+
+  retention_in_days = 30
+}
+
+resource "aws_lambda_permission" "api_gw" {
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.get_metrics.function_name
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_apigatewayv2_api.metrics_gw_api.execution_arn}/*/*"
+}
+
+
+
+
+
+
+
 
 /*
 Security groups
@@ -233,9 +296,15 @@ output "function_name" {
     value = aws_lambda_function.get_metrics.function_name
 }
 
+output "metrics_url" {
+    description = "URL for metrics"
+    value="${aws_apigatewayv2_stage.default.invoke_url}get-metrics"
+}
+
 output "web_server_ip" {
     value = aws_instance.web_server.public_ip
 }
+
 output "db_server_ip" {
     value = aws_instance.db_server.public_ip
 }

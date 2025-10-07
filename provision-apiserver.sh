@@ -21,6 +21,7 @@ npm install pinyin
 echo "$(which node) /home/ubuntu/api/apiserver.js" > apiserver.sh
 sudo chmod 764 apiserver.sh
 
+#Start a service which runs the api server.
 cat << EOF >> apiserver.service
 [Unit]
 Description=API server
