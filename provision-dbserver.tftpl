@@ -56,4 +56,4 @@ EOF
 
 sudo chmod 776 update_metrics.sh
 
-echo "*/1 * * * * ubuntu /home/ubuntu/update_metrics.sh" | sudo tee -a /etc/crontab
+echo "* * */1 * * ubuntu /home/ubuntu/update_metrics.sh" | sudo tee -a /etc/crontab
