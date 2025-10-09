@@ -1,9 +1,6 @@
-#!/bin/bash
-
-sudo apt-get update
-
+sudo apt-get update 
 #TODO: root user name and password. Insecure?
-export MYSQL_PWD='insecure_mysqlroot_pw'
+export MYSQL_PWD='${db_root_password}'
 
 #prepopulate debconf database with answers to questions.
 echo "mysql-server mysql-server/root_password password $MYSQL_PWD" | sudo debconf-set-selections
@@ -13,11 +10,11 @@ sudo apt-get -y install mysql-server
 
 sudo service mysql start
 
-echo "CREATE DATABASE test;" | mysql -u root
+echo "CREATE DATABASE ${db_name};" | mysql -u root
 
-echo "CREATE USER 'webuser'@'%' IDENTIFIED BY 'aaftwup123!';" | mysql -u root
+echo "CREATE USER '${db_user_username}'@'%' IDENTIFIED BY '${db_user_password}';" | mysql -u root
 
-echo "GRANT ALL PRIVILEGES ON test.* TO 'webuser'@'%';" | mysql -u root
+echo "GRANT ALL PRIVILEGES ON ${db_name}.* TO '${db_user_username}'@'%';" | mysql -u root
 
 #Changing mysql config so that it listens on the static private ip
 sudo sed -i'' -e '/bind-address/s/127.0.0.1/${db_server_ip}/' /etc/mysql/mysql.conf.d/mysqld.cnf
@@ -25,35 +22,13 @@ sudo sed -i'' -e '/bind-address/s/127.0.0.1/${db_server_ip}/' /etc/mysql/mysql.c
 #Affect changes.
 sudo service mysql restart
 
-export MYSQL_PWD='aaftwup123!'
+export MYSQL_PWD='${db_user_password}'
+
 #provision database
-cat ~/db/setup-database.sql | mysql -u webuser test
+cat ~/db/setup-database.sql | mysql -u ${db_user_username} ${db_name}
 
 #create testuser with password 
 wget -O /dev/null --post-data="username=testuser&password=testuser&confirm_password=testuser" ${web_server_ip}:80/register.php
 
 # and add words to account.
-cat ~/db/test-populate.sql | mysql -u webuser test
-
-# Download and install aws cli for s3 bucket usage.
-sudo apt-get install unzip
-
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip awscliv2.zip
-sudo ./aws/install
-
-#Create credentials directory ready to recieve credentials
-mkdir ~/.aws
-
-#Create metrics update script to be ran on a regular interval.
-cat << EOF > update_metrics.sh
-#! /bin/bash
-cd /home/ubuntu
-export MYSQL_PWD='aaftwup123!'
-echo "SELECT COUNT(*) FROM users" | mysql -u webuser test | tail -n +2 > out_temp.txt
-aws s3 cp out_temp.txt s3://${metrics_bucket}/number.txt
-EOF
-
-sudo chmod 776 update_metrics.sh
-
-echo "*/1 * * * * ubuntu /home/ubuntu/update_metrics.sh" | sudo tee -a /etc/crontab
+cat ~/db/test-populate.sql | mysql -u ${db_user_username} ${db_name}

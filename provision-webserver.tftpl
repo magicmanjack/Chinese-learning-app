@@ -12,8 +12,11 @@ rm webserver
 sudo mkdir /etc/systemd/system/apache2.service.d
 
 echo "[Service]" | sudo tee -a /etc/systemd/system/apache2.service.d/override.conf > /dev/null
+echo "Environment='DB_NAME=${db_name}'" | sudo tee -a /etc/systemd/system/apache2.service.d/override.conf > /dev/null
 echo "Environment='DB_HOSTNAME=${db_server_ip}'" | sudo tee -a /etc/systemd/system/apache2.service.d/override.conf > /dev/null
 echo "Environment='API_HOSTNAME=${api_server_ip}'" | sudo tee -a /etc/systemd/system/apache2.service.d/override.conf > /dev/null
+echo "Environment='DB_USERNAME=${db_username}'" | sudo tee -a /etc/systemd/system/apache2.service.d/override.conf > /dev/null
+echo "Environment='DB_PASSWORD=${db_password}'" | sudo tee -a /etc/systemd/system/apache2.service.d/override.conf > /dev/null
 
 sudo systemctl daemon-reload
 

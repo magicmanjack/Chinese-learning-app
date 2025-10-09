@@ -2,9 +2,9 @@
     
         //Attempt to connect to db server
         $dbServer = getenv("DB_HOSTNAME");
-        $dbUsername = "webuser";
-        $dbPassword = "aaftwup123!";
-        $dbName = "test";
+        $dbUsername = getenv("DB_USERNAME");
+        $dbPassword = getenv("DB_PASSWORD");
+        $dbName = getenv("DB_NAME");
 
         try {
             $pdo = new PDO("mysql:host=" . $dbServer . ";dbname=" . $dbName, $dbUsername, $dbPassword);

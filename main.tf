@@ -1,120 +1,66 @@
-locals {
-   web_server_priv = "172.31.26.161"
-   db_server_priv = "172.31.26.162"
-   api_server_priv = "172.31.26.163"
+variable "db_name" {
+    description = "The name of the database."
+    type = string
+}
+
+variable "db_private_ip" {
+    description = "The private IPv4 address of the DB server. Put in same CIDR as VPC."
+    type = string
+}
+
+variable "db_root_password" {
+    description = "The root password of the database."
+    type = string
+    sensitive = true
+}
+
+variable "db_user_username" {
+    description = "The username of the main user to access the DB."
+    type = string
+}
+
+variable "db_user_password" {
+    description = "The password of the main user to access the DB"
+    type = string
+    sensitive = true
 }
 
 provider "aws" {
-    region = "us-east-1"
+    region = "ap-southeast-2"
 }
 
-resource "aws_s3_bucket" "metrics_bucket" {
-    bucket = "jack-bredenbecks-metrics-bucket"
-    force_destroy = true
-}
+resource "aws_lightsail_instance" "chinese_app" {
+    name = "chinese_app"
+    availability_zone = "ap-southeast-2a"
+    blueprint_id = "ubuntu_24_04"
+    bundle_id = "nano_3_2"
+    key_pair_name = "ChineseAppKey"
 
-/*
-Lambda function configuration.
-Firstly uploads lambda to s3 bucket.
-*/
-
-data "archive_file" "lambda_get_metrics" {
-    type = "zip"
-
-    source_dir = "${path.module}/lambda/get_metrics"
-    output_path = "${path.module}/lambda/get_metrics.zip"
-}
-
-resource "aws_s3_object" "lambda_get_metrics" {
-    bucket = aws_s3_bucket.metrics_bucket.id
-
-    key = "get_metrics.zip"
-    source = data.archive_file.lambda_get_metrics.output_path
-
-    etag= filemd5(data.archive_file.lambda_get_metrics.output_path)
-}
-
-resource "aws_lambda_function" "get_metrics" {
-    function_name="GetMetrics"
-    s3_bucket = aws_s3_bucket.metrics_bucket.id
-    s3_key = aws_s3_object.lambda_get_metrics.key
-
-    runtime="nodejs20.x"
-    handler="get_metrics.handler"
-
-    source_code_hash = data.archive_file.lambda_get_metrics.output_base64sha256
-    /* forced to use this role as do not access to create role policy.*/
-    role = "arn:aws:iam::781024672893:role/LabRole"
-}
-
-/*
-API Gateway. 
-*/
-
-resource "aws_apigatewayv2_api" "metrics_gw_api" {
-    name = "metrics_gw_api"
-    protocol_type = "HTTP"
-}
-
-resource "aws_apigatewayv2_stage" "default" {
-    api_id =  aws_apigatewayv2_api.metrics_gw_api.id
-    name = "$default"
-    auto_deploy = true
-    access_log_settings {
-      destination_arn = aws_cloudwatch_log_group.api_gw.arn
-
-      format = jsonencode({
-            requestId               = "$context.requestId"
-            sourceIp                = "$context.identity.sourceIp"
-            requestTime             = "$context.requestTime"
-            protocol                = "$context.protocol"
-            httpMethod              = "$context.httpMethod"
-            resourcePath            = "$context.resourcePath"
-            routeKey                = "$context.routeKey"
-            status                  = "$context.status"
-            responseLength          = "$context.responseLength"
-            integrationErrorMessage = "$context.integrationErrorMessage"})
+    connection {
+        type = "ssh"
+        user = "ubuntu"
+        host = self.public_ip_address
+        port = 22
+        private_key = file(pathexpand("~/.ssh/ChineseAppKey.pem"))
     }
+
+    provisioner "file" {
+        source = "webserver"
+        destination = "webserver"
+    }
+
+    provisioner "file" {
+      destination = "/home/ubuntu/prov.sh"
+      content = templatefile("${path.module}/provision-webserver.tftpl", {db_name=var.db_name, db_server_ip=var.db_private_ip, api_server_ip="127.0.0.1", db_username=var.db_user_username, db_password=var.db_user_password})
+    }
+
+    provisioner "remote-exec" {
+        inline = ["sh ~/prov.sh"]
+    }
+    
 }
 
-resource "aws_apigatewayv2_integration" "get_metrics" {
-    api_id = aws_apigatewayv2_api.metrics_gw_api.id
-    integration_uri = aws_lambda_function.get_metrics.invoke_arn
-    integration_type = "AWS_PROXY"
-    integration_method = "POST"
-}
-
-resource "aws_apigatewayv2_route" "get_metrics" {
-    api_id = aws_apigatewayv2_api.metrics_gw_api.id
-    route_key = "GET /get-metrics"
-    target = "integrations/${aws_apigatewayv2_integration.get_metrics.id}"
-}
-
-resource "aws_cloudwatch_log_group" "api_gw" {
-  name = "/aws/api_gw/${aws_apigatewayv2_api.metrics_gw_api.name}"
-
-  retention_in_days = 30
-}
-
-resource "aws_lambda_permission" "api_gw" {
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.get_metrics.function_name
-  principal     = "apigateway.amazonaws.com"
-
-  source_arn = "${aws_apigatewayv2_api.metrics_gw_api.execution_arn}/*/*"
-}
-
-
-
-
-
-
-
-
-/*
-Security groups
-*/
-
+//Security group needed to SSH to EC2
 
 resource "aws_security_group" "allow_ssh" {
     name = "allow_ssh"
@@ -136,36 +82,17 @@ resource "aws_security_group" "allow_ssh" {
     }
 }
 
-resource "aws_security_group" "allow_web" {
-    name = "allow_web"
-    description = "Allow inbound webtraffic"
-
-    ingress {
-        description = "web traffic from anywhere"
-        from_port = 80
-        to_port = 80
-        protocol = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
-    }
-
-    egress {
-        from_port = 0
-        to_port = 0
-        protocol = "-1"
-        cidr_blocks = ["0.0.0.0/0"]
-    }
-}
 
 resource "aws_security_group" "allow_mysql" {
     name="allow_mysql"
     description = "Allow mysql traffic"
 
     ingress {
-        description =  "MySQL traffic from webserver"
+        description =  "Only allow MySQL traffic from webserver"
         from_port = 3306
         to_port = 3306
         protocol = "tcp"
-        cidr_blocks = ["172.31.26.161/32"]
+        cidr_blocks = ["${aws_lightsail_instance.chinese_app.private_ip_address}/32"]
     }
 
     egress {
@@ -177,70 +104,22 @@ resource "aws_security_group" "allow_mysql" {
 
 }
 
-resource "aws_security_group" "allow_api" {
-    name="allow_api"
-    description = "Allow connections to the API server"
-
-    ingress {
-        description="Connections only allowed to API port and only from web server"
-        from_port=3000
-        to_port=3000
-        protocol="tcp"
-        cidr_blocks=["${local.web_server_priv}/32"]
-    }
-    egress {
-        from_port=0
-        to_port=0
-        protocol="-1"
-        cidr_blocks=["0.0.0.0/0"]
-    }
-}
-
-resource "aws_instance" "web_server" {
-    ami = "ami-0360c520857e3138f"
-    instance_type = "t2.micro"
-    key_name = "cosc349-2024"
-    private_ip = local.web_server_priv
-    vpc_security_group_ids = [aws_security_group.allow_ssh.id, aws_security_group.allow_web.id]
-
-    connection {
-        type = "ssh"
-        user = "ubuntu"
-        host = self.public_ip
-        port = 22
-        private_key = file(pathexpand("~/.ssh/cosc349-2024.pem"))
-    }
-
-    provisioner "file" {
-        source = "webserver"
-        destination = "webserver"
-    }
-
-    provisioner "file" {
-      destination = "/home/ubuntu/prov.sh"
-      content = templatefile("${path.module}/provision-webserver.tftpl", {db_server_ip=local.db_server_priv, api_server_ip=local.api_server_priv})
-    }
-
-    provisioner "remote-exec" {
-        inline = ["sh ~/prov.sh"]
-    }
-
-}
-
 resource "aws_instance" "db_server" {
-    ami = "ami-0360c520857e3138f"
+    ami = "ami-0279a86684f669718"
     instance_type = "t2.micro"
-    key_name = "cosc349-2024"
-    private_ip = local.db_server_priv
+    key_name = "dbaccess"
+    private_ip = var.db_private_ip
 
-    vpc_security_group_ids = [aws_security_group.allow_ssh.id, aws_security_group.allow_mysql.id]
+    vpc_security_group_ids = [ aws_security_group.allow_mysql.id, aws_security_group.allow_ssh.id ]
+
+    // Data base provisioning
 
     connection {
         type = "ssh"
         user = "ubuntu"
         host = self.public_ip
         port = 22
-        private_key = file(pathexpand("~/.ssh/cosc349-2024.pem"))
+        private_key = file(pathexpand("~/.ssh/dbaccess.pem"))
     }
 
     provisioner "file" {
@@ -250,64 +129,18 @@ resource "aws_instance" "db_server" {
 
     provisioner "file" {
       destination = "/home/ubuntu/prov.sh"
-      content = templatefile("${path.module}/provision-dbserver.tftpl", {web_server_ip=local.web_server_priv, db_server_ip=local.db_server_priv, metrics_bucket=aws_s3_bucket.metrics_bucket.bucket})
+      content = templatefile("${path.module}/provision-dbserver.tftpl", {web_server_ip=aws_lightsail_instance.chinese_app.private_ip_address, db_server_ip=var.db_private_ip, db_root_password=var.db_root_password, db_name=var.db_name, db_user_username=var.db_user_username, db_user_password=var.db_user_password})
     }
 
     provisioner "remote-exec" {
         inline = ["sh ~/prov.sh"]
     }
-
-    //Copys aws credentials over to db server. Not perfect but works. 
-    provisioner "file" {
-      source = pathexpand("~/.aws/credentials")
-      destination = "/home/ubuntu/.aws/credentials"
-    }
-    
-}
-
-resource "aws_instance" "api_server" {
-    ami = "ami-0360c520857e3138f"
-    instance_type = "t2.micro"
-    key_name = "cosc349-2024"
-    private_ip = local.api_server_priv
-    vpc_security_group_ids = [aws_security_group.allow_ssh.id, aws_security_group.allow_api.id]
-
-    connection {
-        type = "ssh"
-        user = "ubuntu"
-        host = self.public_ip
-        port = 22
-        private_key = file(pathexpand("~/.ssh/cosc349-2024.pem"))
-    }
-
-    provisioner "file" {
-        source = "api"
-        destination = "api"
-    }
-
-    provisioner "remote-exec" {
-        scripts = [ "provision-apiserver.sh" ]
-    }
-
-}
-
-output "function_name" {
-    description = "Name of the lambda function"
-    value = aws_lambda_function.get_metrics.function_name
-}
-
-output "metrics_url" {
-    description = "URL for metrics"
-    value="${aws_apigatewayv2_stage.default.invoke_url}get-metrics"
 }
 
 output "web_server_ip" {
-    value = aws_instance.web_server.public_ip
+    value = aws_lightsail_instance.chinese_app.public_ip_address
 }
 
-output "db_server_ip" {
+output "database_server_ip" {
     value = aws_instance.db_server.public_ip
-}
-output "api_server_ip" {
-    value = aws_instance.api_server.public_ip
 }
