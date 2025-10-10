@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>Chinese learning tool</title>
-        <link rel="stylesheet" href = "style.css">
-        <link rel="stylesheet" href = "styles/ndex_style.css">
+        <title>Accelerate Chinese 学习中文</title>
+        <link rel="stylesheet" href = "styles/index_style.css">
     </head>
     <body>
         
-        <h2>Chinese learning tool</h2>
-        <div>
-            <a href="/login.php">Sign in</a>
+        <h2>Accelerate Chinese 学习中文</h2>
+        <div style="background-color: rgba(255, 255, 255, 1);">
+            <div>
+                <a href="/login.php">Sign in</a>
+            </div>
+            <div>
+                <a href="/register.php">Register</a>
+            </div>
         </div>
-        <div>
-            <a href="/register.php">Register</a>
-        </div>
-        
     </body>
 </html>

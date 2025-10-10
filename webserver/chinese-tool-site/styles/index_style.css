@@ -1,0 +1,18 @@
+body {
+    background-color: rgb(181, 15, 15);
+    font-family: 'Lucida Console', monospace;
+}
+
+h2 {
+    color:#fce303;
+}
+
+a {
+    color:#333333;
+}
+
+div {
+    padding: 10px;
+    border-radius: 25px;
+}
+
