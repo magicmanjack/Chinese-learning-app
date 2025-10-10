@@ -35,7 +35,8 @@ resource "aws_lightsail_instance" "chinese_app" {
     blueprint_id = "ubuntu_24_04"
     bundle_id = "nano_3_2"
     key_pair_name = "ChineseAppKey"
-
+    
+    //Provision webserver
     connection {
         type = "ssh"
         user = "ubuntu"
@@ -57,6 +58,18 @@ resource "aws_lightsail_instance" "chinese_app" {
     provisioner "remote-exec" {
         inline = ["sh ~/prov.sh"]
     }
+
+    //provision API server in the webserver
+
+    provisioner "file" {
+        source = "api"
+        destination = "api"
+    }
+
+    provisioner "remote-exec" {
+        scripts = [ "provision-apiserver.sh" ]
+    }
+
     
 }
 

@@ -3,6 +3,7 @@
     <head>
         <title>Chinese learning tool</title>
         <link rel="stylesheet" href = "style.css">
+        <link rel="stylesheet" href = "styles/ndex_style.css">
     </head>
     <body>
         
